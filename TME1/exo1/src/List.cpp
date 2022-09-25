@@ -1,4 +1,5 @@
 
+#include "List.h" // FAUTE : omission de fichier d'en-tete
 namespace pr {
 
 // ******************* Chainon
@@ -12,7 +13,7 @@ size_t Chainon::length() {
 	return length();
 }
 
-void Chainon::print (std::ostream & os) {
+void Chainon::print (std::ostream & os) const { // FAUTE : omission de "const"
 	os << data ;
 	if (next != nullptr) {
 		os << ", ";
@@ -41,11 +42,11 @@ void List::push_back (const std::string& val) {
 	}
 }
 
-void List::push_front (const std::string& val) {
-	tete = new Chainon(val,tete);
-}
+//void List::push_front (const std::string& val) { // FAUTE : declaration superflue
+//	tete = new Chainon(val,tete);
+//}
 
-bool empty() {
+bool List::empty() { // FAUTE : omission de l'opérateur de resolution de portee
 	return tete == nullptr;
 }
 
@@ -59,7 +60,7 @@ size_t List::size() const {
 
 } // namespace pr
 
-std::ostream & operator<< (std::ostream & os, const pr::List & vec)
+std::ostream & pr::operator<< (std::ostream & os, const pr::List & vec) // FAUTE : omission operateur de resolution de portee PR
 {
 	os << "[";
 	if (vec.tete != nullptr) {
