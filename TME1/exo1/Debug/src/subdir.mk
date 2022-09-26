@@ -5,16 +5,19 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/List.cpp \
+../src/String.cpp \
 ../src/TD1.cpp \
 ../src/main.cpp 
 
 CPP_DEPS += \
 ./src/List.d \
+./src/String.d \
 ./src/TD1.d \
 ./src/main.d 
 
 OBJS += \
 ./src/List.o \
+./src/String.o \
 ./src/TD1.o \
 ./src/main.o 
 
@@ -31,7 +34,7 @@ src/%.o: ../src/%.cpp src/subdir.mk
 clean: clean-src
 
 clean-src:
-	-$(RM) ./src/List.d ./src/List.o ./src/TD1.d ./src/TD1.o ./src/main.d ./src/main.o
+	-$(RM) ./src/List.d ./src/List.o ./src/String.d ./src/String.o ./src/TD1.d ./src/TD1.o ./src/main.d ./src/main.o
 
 .PHONY: clean-src
 
