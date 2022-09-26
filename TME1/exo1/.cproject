@@ -24,6 +24,7 @@
 								<option id="gnu.cpp.compiler.exe.debug.option.optimization.level.1295086528" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option defaultValue="gnu.cpp.compiler.debugging.level.max" id="gnu.cpp.compiler.exe.debug.option.debugging.level.1555908216" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.dialect.std.1323982139" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.dialect.flags.1925854189" superClass="gnu.cpp.compiler.option.dialect.flags" useByScannerDiscovery="true" value="" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1981755606" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.2059414759" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
@@ -46,9 +47,10 @@
 					</folderInfo>
 					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1074853797.131627759" name="/" resourcePath="src">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.418654989" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">
+							<targetPlatform id="cdt.managedbuild.target.gnu.platform.exe.debug" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.156572749" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.594522753"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.362130131" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1455893706">
-								<option id="gnu.cpp.compiler.option.dialect.flags.1557486607" superClass="gnu.cpp.compiler.option.dialect.flags" useByScannerDiscovery="true" value="-std=c++1y" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.dialect.flags.1557486607" name="Other dialect flags" superClass="gnu.cpp.compiler.option.dialect.flags" useByScannerDiscovery="true" value="" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.255691232" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.784387594" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.2059414759">

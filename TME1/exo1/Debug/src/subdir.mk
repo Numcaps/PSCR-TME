@@ -5,14 +5,17 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/List.cpp \
+../src/TD1.cpp \
 ../src/main.cpp 
 
 CPP_DEPS += \
 ./src/List.d \
+./src/TD1.d \
 ./src/main.d 
 
 OBJS += \
 ./src/List.o \
+./src/TD1.o \
 ./src/main.o 
 
 
@@ -20,7 +23,7 @@ OBJS += \
 src/%.o: ../src/%.cpp src/subdir.mk
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -std=c++1y -std=c++1y -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
+	g++ -std=c++1y -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
@@ -28,7 +31,7 @@ src/%.o: ../src/%.cpp src/subdir.mk
 clean: clean-src
 
 clean-src:
-	-$(RM) ./src/List.d ./src/List.o ./src/main.d ./src/main.o
+	-$(RM) ./src/List.d ./src/List.o ./src/TD1.d ./src/TD1.o ./src/main.d ./src/main.o
 
 .PHONY: clean-src
 

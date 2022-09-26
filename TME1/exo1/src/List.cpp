@@ -10,15 +10,17 @@ size_t Chainon::length() {
 	if (next != nullptr) {
 		len += next->length();
 	}
-	return length();
+	return len;
+	//return length(); // FAUTE : appel recursif infini
 }
 
 void Chainon::print (std::ostream & os) const { // FAUTE : omission de "const"
 	os << data ;
 	if (next != nullptr) {
 		os << ", ";
+		next->print(os);
 	}
-	next->print(os);
+	//next->print(os); // FAUTE : mauvais emplacement de l'instruction
 }
 
 // ******************  List
