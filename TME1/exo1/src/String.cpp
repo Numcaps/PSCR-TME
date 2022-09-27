@@ -36,6 +36,16 @@ String& String::operator=(const String& s1)
 
 }
 
+bool String::operator<(const String& a) const
+{
+	return pr::compare(this->str, a.str) < 0 ? true : false;
+}
+
+bool operator==(const String& a, const String& b)
+{
+	return pr::compare(a.str, b.str) == 0 ? true : false;
+}
+
  String::~String()
  {
 	 delete [] str;

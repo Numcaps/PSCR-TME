@@ -20,11 +20,15 @@ public :
 	String(const String& s); // constructeur par copie
 	size_t length() const;
 	friend std::ostream & operator<<(std::ostream& os, const String& s);
+	friend bool operator==(const String& a, const String& b);
 	String& operator=(const String& s1);
+	bool operator<(const String & b) const;
+
 	~String(); // destructeur
 };
 
-std::ostream & operator<<(std::ostream& os, const String& s);
 
+std::ostream & operator<<(std::ostream& os, const String& s);
+bool operator==(const String& a, const String& b);
 
 #endif /* STRING_HPP_ */

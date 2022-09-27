@@ -59,7 +59,7 @@ int main() {
 
 	// Test String class
 	String s1("Hello World!"); // appel constructeur a un arg
-	String s2("Bip Bip Boup !");
+	String s2("Bip Bip Boup Boup !");
 	String s3(s2); // appel constructeur par copie
 	std::cout << "Affichage de s1 : "<< s1 << std::endl; // impression grace a redef de <<
 	std::cout << "Affichage de s2 et s3 : " << s2 << ", " << s3 <<std::endl;
@@ -67,6 +67,11 @@ int main() {
 	s3 = s1;
 	std::cout << "Affichage de s3 apres affectation avec s1 : " << s3 <<std::endl;
 	std::cout << "Affichage des adresses de s1 et s3 : "<< &s1 << ", " << &s3<<std::endl;
+	std::cout << "Test d'egalite entre s3 et s1 : " << (s3 == s1) << std::endl;
+	std::cout << "Test d'egalite entre s3 et s2 : " << (s3 == s2) << std::endl;
+	std::cout << "Test relation d'ordre < entre s1 et s2 : " << (s1<s2) << std::endl;
+	std::cout << "Test relation d'ordre < entre s2 et s1 : " << (s2<s1) << std::endl;
+
 
 	return 0;
 
