@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/num/Documents/PSCR-TME/TME2/HashTable.cpp
+HashTable.hpp
+/home/num/Documents/PSCR-TME/TME2/HashTable.hpp
+
+/home/num/Documents/PSCR-TME/TME2/HashTable.hpp
+cstddef
+-
+vector
+-
+forward_list
+-
+
+/home/num/Documents/PSCR-TME/TME2/mainHashTable.cpp
+iostream
+-
+fstream
+-
+regex
+-
+chrono
+-
+vector
+-
+string
+-
+HashTable.hpp
+/home/num/Documents/PSCR-TME/TME2/HashTable.hpp
+
