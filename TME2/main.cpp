@@ -10,10 +10,10 @@ int main()
 	using namespace std;
 	using namespace std::chrono;
 
-	ifstream input = ifstream("/users/nfs/Etu5/3809215/Documents/PSCR/PSCR-TME/TME2/WarAndPeace.txt");
+	ifstream input = ifstream("/home/num/Documents/PSCR-TME/TME2/WarAndPeace.txt");
 
 	auto start = steady_clock::now();
-	cout << "Parsing War and Peace" << endl;
+	std::cout << "Parsing War and Peace" << endl;
 
 	size_t nombre_lu = 0;
 	// prochain mot lu
@@ -22,12 +22,11 @@ int main()
 	regex re(R"([^a-zA-Z])");
 
 	// Q1
-	vector<string> encountered_words;
+	// vector<string> encountered_words;
 	int count_diff_num = 0;
 
-	// Q2
-	vector<pair<string,int>> occur_count;
-
+	// Q3
+	vector<pair<string, int>> occur_count;
 
 	while (input >> word)
 	{
@@ -37,40 +36,55 @@ int main()
 		transform(word.begin(), word.end(), word.begin(), ::tolower);
 
 		// word est maintenant "tout propre"
-		/*if (nombre_lu % 100 == 0)
+		if (nombre_lu % 100 == 0)
 			// on affiche un mot "propre" sur 100
-			cout << nombre_lu << ": " << word << endl;*/
+			std::cout << nombre_lu << ": " << word << endl;
 		nombre_lu++;
 
-		vector<string>::iterator it;
-		for (it = encountered_words.begin(); it != encountered_words.end(); ++it)
+		vector<pair<string, int>>::iterator it;
+		for (it = occur_count.begin(); it != occur_count.end(); ++it)
 		{
-			if (word == *it)
+			if ((*it).first == word)
 			{
-				occur_count.push_back()
+				++(*it).second;
 				break;
-			}	
+			}
 		}
 
-		if (it == encountered_words.end())
+		if (it == occur_count.end())
 		{
-			// ajout de tout les mots dans le vecteur
-			encountered_words.push_back(word);
+			// creation d'une nouvelle pair
+			pair<string, int> new_pair(word, 1);
+
+			// insertion de la pair
+			occur_count.push_back(new_pair);
 			++count_diff_num;
 		}
 	}
-	
 
 	input.close();
 
-	cout << "Finished Parsing War and Peace" << endl;
+	std::cout << "Finished Parsing War and Peace" << endl;
 
 	auto end = steady_clock::now();
-	cout << "Parsing took "
+	std::cout << "Parsing took "
 		 << duration_cast<milliseconds>(end - start).count()
 		 << "ms.\n";
 
-	cout << "Found a total of " << nombre_lu << " words." << endl;
-	cout << "Count of different words : " << count_diff_num << endl;
+	std::cout << "Found a total of " << nombre_lu << " words." << endl;
+	std::cout << "Count of different words : " << count_diff_num << endl;
+
+	// parcour du vecteur pour trouver "war", "peace", "toto"
+	vector<pair<string, int>>::iterator it;
+	for (it = occur_count.begin(); it != occur_count.end(); ++it)
+	{
+		if (!strcmp((*it).first.c_str(), "war"))
+			std::cout << "Occurences of \"war\" : " << (*it).second << endl;
+		else if (!strcmp((*it).first.c_str(), "peace"))
+			std::cout << "Occurences of \"peace\" : " << (*it).second << endl;
+		else if (!strcmp((*it).first.c_str(), "toto"))
+			std::cout << "Occurences of \"toto\" : " << (*it).second << endl;
+	}
+
 	return 0;
 }
