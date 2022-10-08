@@ -4,7 +4,7 @@
 #include <chrono>
 #include <vector>
 #include <string>
-
+#include "utils.hpp"
 int main()
 {
 	using namespace std;
@@ -41,6 +41,7 @@ int main()
 			std::cout << nombre_lu << ": " << word << endl;*/
 		nombre_lu++;
 
+		// cherche si la pair est deja presente
 		vector<pair<string, int>>::iterator it;
 		for (it = occur_count.begin(); it != occur_count.end(); ++it)
 		{
@@ -51,6 +52,7 @@ int main()
 			}
 		}
 
+		// la pair n'est pas presente
 		if (it == occur_count.end())
 		{
 			// creation d'une nouvelle pair
@@ -85,6 +87,10 @@ int main()
 		else if (!strcmp((*it).first.c_str(), "toto"))
 			std::cout << "Occurences of \"toto\" : " << (*it).second << endl;
 	}
-
+	
+	
+	//test des fonctions count et count_if_equal
+	std::cout << pr::count(occur_count.begin(),occur_count.end()) << std::endl;
+	
 	return 0;
 }

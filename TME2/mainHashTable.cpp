@@ -12,7 +12,7 @@ int main()
     using namespace std::chrono;
 
     ifstream input = ifstream("/home/num/Documents/PSCR-TME/TME2/WarAndPeace.txt");
-    ofstream MyFile("filename.txt");
+    
 
     auto start = steady_clock::now();
     std::cout << "Parsing War and Peace" << endl;
@@ -37,7 +37,7 @@ int main()
         word = regex_replace(word, re, "");
         // passe en lowercase
         transform(word.begin(), word.end(), word.begin(), ::tolower);
-        MyFile<<word<<" ";
+        
         // word est maintenant "tout propre"
         /*if (nombre_lu % 100 == 0)
             // on affiche un mot "propre" sur 100
@@ -80,6 +80,8 @@ int main()
     std::cout << "Occurences of \"toto\" : " << b << endl;
     std::cout << "Table capacity : " << occur_count.capacity() << std::endl;    // vecteur des entrees
     std::vector<pair<string,int>> v_entry ;
+
+    pr::HashTable::Iterator it = occur_count.begin();
     
     return 0;
 }

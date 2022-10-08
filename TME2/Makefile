@@ -2,9 +2,9 @@ COMMAND = g++
 FLAGS = -W -Wall -ansi -pedantic -g -std=c++1y 
 INPUTS = main.cpp
 
-main: main.cpp 
-	$(COMMAND) $(FLAGS) -o main main.cpp
-
+main: main.cpp utils.hpp
+	$(COMMAND) $(FLAGS) -o main main.cpp 
+	
 mainHashTable: mainHashTable.o  HashTable.hpp
 	$(COMMAND) $(FLAGS) -o mainHashTable  mainHashTable.o 
 

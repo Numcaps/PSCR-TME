@@ -10,7 +10,8 @@ namespace pr
     template <typename K, typename V>
     class HashTable
     {
-    private:
+
+        private:
         class Entry
         {
 
@@ -30,11 +31,54 @@ namespace pr
                 return value;
             }
         };
+
         typedef std::vector<std::forward_list<Entry>> buckets_t;
         buckets_t buckets;
         size_t sz;
         size_t capacity_;
 
+    
+
+        // iterator
+        class Iterator
+        {
+            // attributes
+            typename HashTable::buckets_t *buckets_;                     // pointeur sur le buckets
+            typename buckets_t::iterator vit_;                // iterateur sur la liste explore actuellement
+            typename std::forward_list<Entry>::iterator lit_; // pointeur sur l'objet Entry
+        public:
+            Iterator() : buckets_(&buckets), vit_(buckets_->begin()), lit_(vit_->begin()) {}
+
+            Iterator &operator++()
+            {
+                if (lit_ != vit_->end())
+                {
+                    lit_++;
+                }
+                else
+                {
+                    // si vit_ n'atteint pas la fin de la table et qu'il tombe toujour sur
+                    // une case vide
+                    for (; (vit_ != buckets->end()) and vit_->empty(); ++vit_)
+                    {
+                    }
+                    lit_ = *vit_;
+                }
+                return lit_;
+            }
+            bool operator!=(const Iterator &other)
+            {
+                return (vit_ != other.vit_ and lit_ != other.lit_);
+            }
+
+            Entry &operator*()
+            {
+                return *lit_;
+            }
+
+            
+        };
+       
     public:
         // CTOR
         HashTable(size_t init_capa = 100) : capacity_(init_capa)
@@ -66,7 +110,7 @@ namespace pr
         bool put(const K &key, const V &value)
         {
             if (sz >= 0.8 * capacity_)
-             grow(); // on test si la taille de la table est inferieur a sa capacite
+                grow(); // on test si la taille de la table est inferieur a sa capacite
             //  sinon on l'agrandit
 
             size_t h = std::hash<K>()(key) % capacity_; // calcule de l'index
@@ -125,8 +169,15 @@ namespace pr
                 }
             }
         }
-    };
 
+        Iterator & begin()
+            {
+                for (vit_; vit_->empty(); vit_++){}
+                
+
+                
+            }
+    };
 
 }
 #endif
