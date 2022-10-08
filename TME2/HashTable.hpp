@@ -13,70 +13,120 @@ namespace pr
     private:
         class Entry
         {
-        public:
+
             const K key;
             V value;
-            Entry(const K k, V v) : key(k), value(v){} // liste initialisation obligatoire car key = const
-           
+
+        public:
+            Entry(const K k, V v) : key(k), value(v) {} // liste initialisation obligatoire car key = const
+            // accessors
+            const K &getK()
+            {
+                return key;
+            }
+
+            V &getV()
+            {
+                return value;
+            }
         };
         typedef std::vector<std::forward_list<Entry>> buckets_t;
         buckets_t buckets;
+        size_t sz;
+        size_t capacity_;
 
     public:
         // CTOR
-        HashTable(size_t init = 100)
+        HashTable(size_t init_capa = 100) : capacity_(init_capa)
         {
-            buckets.reserve(init); // alloue espace memoire de taille init
+            sz = 0;
+            buckets.reserve(init_capa); // alloue espace memoire de taille init
 
             // initialisation avec des listes vides
-            for (auto it = buckets.begin(); it != buckets.end(); ++it)
+
+            for (size_t i = 0; i < capacity_; i++)
             {
-                *it = std::forward_list<Entry>();
+                buckets.push_back(std::forward_list<Entry>());
             }
         }
 
         V *get(const K &key)
         {
-            size_t h = std::hash<K>()(key);                                  // calcule de l'index
+
+            size_t h = std::hash<K>()(key) % capacity_;
+            // calcule de l'index
             for (auto it = buckets[h].begin(); it != buckets[h].end(); ++it) // sinon
             {
-                if (key == it->key)
-                    return &(it->value); // renvoie l'adresse
+                if (key == it->getK())
+                    return &(it->getV()); // renvoie l'adresse
             }
             return nullptr; // si on arrive ici alors la cle n'existe pas
         }
 
         bool put(const K &key, const V &value)
         {
+            if (sz >= 0.8 * capacity_)
+             grow(); // on test si la taille de la table est inferieur a sa capacite
+            //  sinon on l'agrandit
 
-            size_t h = std::hash<K>()(key); // calcule de l'index
-            bool res;
+            size_t h = std::hash<K>()(key) % capacity_; // calcule de l'index
 
             for (auto it = buckets[h].begin(); it != buckets[h].end(); ++it)
             {
-                if (key == it->key)
+                if (key == it->getK())
                 {
-                    it->value = value;
-                    res = true;
-                    break;
+                    it->getV() = value;
+
+                    return true;
                 }
             }
             // la pair n'existe pas dans la  liste
+            ++sz; // incremente le nombre d'item de la hashtable
             buckets[h].push_front(Entry(key, value));
-            res = false;
-            return res;
+
+            return false;
         }
         size_t size() const
         {
-            size_t cpt = 0;
-            for (auto it = buckets.begin(); it != buckets.end(); ++it)
+            return sz;
+        }
+
+        size_t capacity() const
+        {
+            return capacity_;
+        }
+
+        void grow()
+        {
+
+            HashTable<K, V> tmp(capacity_ * 2); // construction d'un temporaire
+            for (auto &b : buckets)             // itere sur les buckets
             {
-                if (!it->empty()) // si la liste n'est pas vide
-                    ++cpt;
+                for (Entry &e : b) // itere sur les elements d'un bucket
+                {
+                    tmp.put(e.getK(), e.getV());
+                }
             }
-            return cpt;
+            *this = tmp;
+        }
+
+        void print()
+        {
+            for (auto b : buckets)
+            {
+                if (!b.empty())
+                {
+                    std::cout << "{";
+                    for (auto e : b)
+                    {
+                        std::cout << "<" << e.getK() << ", " << e.getV() << ">, ";
+                    }
+                    std::cout << "}" << std::endl;
+                }
+            }
         }
     };
+
 
 }
 #endif

@@ -36,9 +36,9 @@ int main()
 		transform(word.begin(), word.end(), word.begin(), ::tolower);
 
 		// word est maintenant "tout propre"
-		if (nombre_lu % 100 == 0)
+		/*if (nombre_lu % 100 == 0)
 			// on affiche un mot "propre" sur 100
-			std::cout << nombre_lu << ": " << word << endl;
+			std::cout << nombre_lu << ": " << word << endl;*/
 		nombre_lu++;
 
 		vector<pair<string, int>>::iterator it;
