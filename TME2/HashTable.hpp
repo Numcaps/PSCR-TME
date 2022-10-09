@@ -11,7 +11,7 @@ namespace pr
     class HashTable
     {
 
-        private:
+    private:
         class Entry
         {
 
@@ -37,17 +37,16 @@ namespace pr
         size_t sz;
         size_t capacity_;
 
-    
-
+        public:
         // iterator
         class Iterator
         {
             // attributes
-            typename HashTable::buckets_t *buckets_;                     // pointeur sur le buckets
+            typename HashTable::buckets_t *buckets_;          // pointeur sur le buckets
             typename buckets_t::iterator vit_;                // iterateur sur la liste explore actuellement
             typename std::forward_list<Entry>::iterator lit_; // pointeur sur l'objet Entry
         public:
-            Iterator() : buckets_(&buckets), vit_(buckets_->begin()), lit_(vit_->begin()) {}
+            Iterator(typename HashTable::buckets_t *b, typename buckets_t::iterator v, typename std::forward_list<Entry>::iterator l) : buckets_(b), vit_(v), lit_(l) {}
 
             Iterator &operator++()
             {
@@ -75,10 +74,8 @@ namespace pr
             {
                 return *lit_;
             }
-
-            
         };
-       
+
     public:
         // CTOR
         HashTable(size_t init_capa = 100) : capacity_(init_capa)
@@ -170,13 +167,22 @@ namespace pr
             }
         }
 
-        Iterator & begin()
+        Iterator begin()
+        {
+            // recuperation du pointeur sur le premier bucket non vide
+            auto it = buckets.begin();
+            while (it != buckets.end())
             {
-                for (vit_; vit_->empty(); vit_++){}
-                
+                if (!it->empty())
+                {
+                    break;
+                }
 
-                
+                ++it;
             }
+            return Iterator(&buckets, it, it->begin());
+        }
+        
     };
 
 }

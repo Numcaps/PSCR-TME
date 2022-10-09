@@ -61,7 +61,7 @@ int main()
 
     std::cout << "Finished Parsing War and Peace" << endl;
 
-    occur_count.print();
+   // occur_count.print();
 
     auto end = steady_clock::now();
     std::cout << "Parsing took "
@@ -81,7 +81,7 @@ int main()
     std::cout << "Table capacity : " << occur_count.capacity() << std::endl;    // vecteur des entrees
     std::vector<pair<string,int>> v_entry ;
 
-    pr::HashTable::Iterator it = occur_count.begin();
+    pr::HashTable<string, int>::Iterator it = occur_count.begin();
     
     return 0;
 }
