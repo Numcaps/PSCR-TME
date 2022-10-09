@@ -10,8 +10,7 @@ namespace pr
     template <typename K, typename V>
     class HashTable
     {
-
-    private:
+    public:
         class Entry
         {
 
@@ -32,12 +31,13 @@ namespace pr
             }
         };
 
+    private:
         typedef std::vector<std::forward_list<Entry>> buckets_t;
         buckets_t buckets;
         size_t sz;
         size_t capacity_;
 
-        public:
+    public:
         // iterator
         class Iterator
         {
@@ -50,20 +50,21 @@ namespace pr
 
             Iterator &operator++()
             {
-                if (lit_ != vit_->end())
+                if (++lit_ != vit_->end())
                 {
-                    lit_++;
                 }
                 else
                 {
-                    // si vit_ n'atteint pas la fin de la table et qu'il tombe toujour sur
+                    // si vit_ n'atteint pas la fin de la table et qu'il tombe toujours sur
                     // une case vide
-                    for (; (vit_ != buckets->end()) and vit_->empty(); ++vit_)
+                    do
                     {
-                    }
-                    lit_ = *vit_;
+                        ++vit_;
+                    } while ((vit_ != buckets_->end()) and (vit_->empty()));
+
+                    lit_ = vit_->begin();
                 }
-                return lit_;
+                return *this;
             }
             bool operator!=(const Iterator &other)
             {
@@ -106,10 +107,6 @@ namespace pr
 
         bool put(const K &key, const V &value)
         {
-            if (sz >= 0.8 * capacity_)
-                grow(); // on test si la taille de la table est inferieur a sa capacite
-            //  sinon on l'agrandit
-
             size_t h = std::hash<K>()(key) % capacity_; // calcule de l'index
 
             for (auto it = buckets[h].begin(); it != buckets[h].end(); ++it)
@@ -137,15 +134,17 @@ namespace pr
             return capacity_;
         }
 
+        // pb de invalid read of size
         void grow()
         {
 
-            HashTable<K, V> tmp(capacity_ * 2); // construction d'un temporaire
-            for (auto &b : buckets)             // itere sur les buckets
+            HashTable<K, V> tmp(capacity_ * 2);                           // construction d'un temporaire
+            for (auto vit = buckets.begin(); vit != buckets.end(); ++vit) // itere sur les buckets
             {
-                for (Entry &e : b) // itere sur les elements d'un bucket
+
+                for (auto lit = vit->begin(); lit != vit->end(); ++lit) // itere sur les elements d'un bucket
                 {
-                    tmp.put(e.getK(), e.getV());
+                    tmp.put(lit->getK(), lit->getV());
                 }
             }
             *this = tmp;
@@ -182,7 +181,24 @@ namespace pr
             }
             return Iterator(&buckets, it, it->begin());
         }
-        
+
+        Iterator end()
+        {
+            size_t cpt = 0;
+            auto vit = buckets.begin();
+            for (; vit != buckets.end(); ++vit)
+            {
+                for (auto lit = vit->begin(); lit != vit->end(); ++lit)
+                {
+                    ++cpt;
+                }
+                if (cpt == sz)
+                {
+                    break;
+                }
+            }
+            return Iterator(&buckets, ++vit, vit->begin());
+        }
     };
 
 }
