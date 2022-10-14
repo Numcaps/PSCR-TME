@@ -12,7 +12,7 @@ int main()
     using namespace std::chrono;
 
     ifstream input = ifstream("/home/num/Documents/PSCR-TME/TME2/WarAndPeace.txt");
-    ofstream output ("log.txt");
+    ofstream output("log.txt");
     auto start = steady_clock::now();
     std::cout << "Parsing War and Peace" << endl;
 
@@ -29,10 +29,12 @@ int main()
     // Q10
     pr::HashTable<string, int> occur_count(1000);
 
+    std::cout << "-----Starting text parsing-----" << std::endl;
     while (input >> word)
     {
-        // std::cout << occur_count.capacity()<< std::endl;
-        //  élimine la ponctuation et les caractères spéciaux
+        // std::cout << "Iteration number :" << nombre_lu <<std::endl;
+        //  std::cout << occur_count.capacity()<< std::endl;
+        //   élimine la ponctuation et les caractères spéciaux
         word = regex_replace(word, re, "");
         // passe en lowercase
         transform(word.begin(), word.end(), word.begin(), ::tolower);
@@ -62,8 +64,7 @@ int main()
     }
 
     input.close();
-
-    std::cout << "Finished Parsing War and Peace" << endl;
+    std::cout << "-----Finish text parsing-----" << std::endl;
 
     // occur_count.print();
 
@@ -76,26 +77,35 @@ int main()
     std::cout << "Count of different words : " << count_diff_num << endl;
 
     // parcours du vecteur pour trouver "war", "peace", "toto"
-
+    std::cout << "-----Starting count occurences-----\n\n";
     std::cout << "Occurences of \"war\" : " << *(occur_count.get("war")) << endl;
     std::cout << "Occurences of \"peace\" : " << *(occur_count.get("peace")) << endl;
     int *a = occur_count.get("toto");
     size_t b = a ? *a : 0;
     std::cout << "Occurences of \"toto\" : " << b << endl;
     std::cout << "Table capacity : " << occur_count.capacity() << std::endl; // vecteur des entrees
+    std::cout << "-----Finish count occurences-----\n\n";
 
+    std::cout << "-----Starting copy HT-----\n\n";
+    // recopie du contenu de HT dans le vector
+    std::cout << "RECOPIE" << std::endl;
     std::vector<pair<string, int>> v_entry;
     pr::HashTable<string, int>::Iterator it = occur_count.begin();
-    for (; it != occur_count.end(); ++it)
+
+    auto e = occur_count.end();
+    for (; it != e; ++it)
     {
-        v_entry.push_back(pair<string,int>((*it).getK(),(*it).getV()));
+        v_entry.push_back(pair<string, int>((*it).getK(), (*it).getV()));
     }
+
+    std::cout << "-----Finish count HT-----\n\n";
     std::cout << v_entry.size() << std::endl;
     std::cout << occur_count.size() << std::endl;
-occur_count.print();
-    for(auto it = v_entry.begin(); it!=v_entry.end(); ++it)
-    {
-        output << it->first << ", " << it->second <<std::endl;
-    }
+
+    // occur_count.print();
+    // for (auto it = v_entry.begin(); it != v_entry.end(); ++it)
+    // {
+    //     output << it->first << ", " << it->second << std::endl;
+    // }
     return 0;
 }

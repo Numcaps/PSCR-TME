@@ -50,25 +50,39 @@ namespace pr
 
             Iterator &operator++()
             {
-                if (++lit_ != vit_->end())
-                {
-                }
-                else
+                int cnt = 0;
+                //std::cout << "Section 1 ++ : " << std::endl;
+                if (++lit_ == vit_->end())
                 {
                     // si vit_ n'atteint pas la fin de la table et qu'il tombe toujours sur
                     // une case vide
+
+                    // if(vit_->begin()->getK() == std::string("fees"))
+                    //   std::cout << "OK!!!!!!!!" << std::endl ;
+                    //std::cout << "Section 2 ++ : " << std::endl;
                     do
                     {
                         ++vit_;
                     } while ((vit_ != buckets_->end()) and (vit_->empty()));
-
+                    //std::cout << "Section 3 ++ : " << std::endl;
+                    
+                    
+                    //std::cout << "Section 4 ++ : " << std::endl;
                     lit_ = vit_->begin();
                 }
+                //std::cout << "Section 5 ++ : " << std::endl;
                 return *this;
             }
             bool operator!=(const Iterator &other)
             {
-                return (vit_ != other.vit_ and lit_ != other.lit_);
+                if (vit_ != buckets_->end())
+                {
+                    return (vit_ != other.vit_ and lit_ != other.lit_);
+                }
+                else
+                {
+                    return vit_ != other.vit_;
+                }               
             }
 
             Entry &operator*()
@@ -169,35 +183,51 @@ namespace pr
         Iterator begin()
         {
             // recuperation du pointeur sur le premier bucket non vide
+            //std::cout << "Section 1"<< std::endl;
             auto it = buckets.begin();
+            //std::cout << "Section 2"<< std::endl;
+            int ct = 0;
             while (it != buckets.end())
             {
-                if (!it->empty())
+                //std::cout << "Section 3 : "<< ct << std::endl;
+
+                if (not(it->empty()))
                 {
+                    //std::cout << "Section 3.1 : "<< std::endl;
                     break;
                 }
-
+                ++ct;
                 ++it;
             }
+            //std::cout << "Section 4"<< std::endl;
             return Iterator(&buckets, it, it->begin());
         }
 
         Iterator end()
-        {
+        {   
+            int ct = 0;
+            //std::cout << "Section 5 : "<< std::endl;
             size_t cpt = 0;
             auto vit = buckets.begin();
+            //std::cout << "Section 6 : "<< std::endl;
             for (; vit != buckets.end(); ++vit)
             {
-                for (auto lit = vit->begin(); lit != vit->end(); ++lit)
+                auto lit = vit->begin();
+                for (; lit != vit->end(); ++lit)
                 {
                     ++cpt;
                 }
+
                 if (cpt == sz)
                 {
                     break;
                 }
             }
-            return Iterator(&buckets, ++vit, vit->begin());
+            //std::cout << "Section 7 : "<< std::endl;
+            ++vit;            
+            /* AWKWARD BUG, PRE-INCR IN CTOR ARGS NOT WORKING (VALUE NOT INCREMENTED)*/
+            /* Valeur de lit aleatoire */
+            return Iterator(&buckets, vit, (--vit)->begin());
         }
     };
 
