@@ -15,4 +15,4 @@ mainHashTable.o : mainHashTable.cpp HashTable.hpp
 	$(COMMAND) $(FLAGS) -c mainHashTable.cpp -o mainHashTable.o 
 
 clean:
-	rm main mainHashTable *.o
+	rm main mainHashTable mainMap *.o

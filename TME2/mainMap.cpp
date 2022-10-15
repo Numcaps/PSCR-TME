@@ -52,7 +52,7 @@ int main()
 
         if (not(val.second)) // si word est deja dans la table
         {
-            val.first->second += 1 ;
+            val.first->second += 1;
         }
         else
         {
@@ -80,7 +80,6 @@ int main()
     std::cout << "Table capacity : " << occur_count.bucket_count() << std::endl; // vecteur des entrees
     std::cout << "-----Finish count occurences-----\n\n";
 
-    
     // recopie du contenu de HT dans le vector
     std::cout << "-----Starting copy HT-----\n\n";
     std::cout << "RECOPIE" << std::endl;
@@ -96,21 +95,40 @@ int main()
     std::cout << v_entry.size() << std::endl;
     std::cout << occur_count.size() << std::endl;
 
-    std::unordered_map<int, forward_list<std::string>> r_occur_count;
-    
-//     for(auto & e : occur_count)
-//     {
-//         std::cout << "["<< e.first << ", "<< e.second << "]"<< std::endl;
-//     }
-//     // Tri du vector
-//    std::sort(v_entry.begin(), v_entry.end(), 
-//     [](pair<string, int> & a, pair<string, int> & b){
-//         return a.second>b.second;
-//     });
-//     for (auto it = v_entry.begin(); it != v_entry.end(); ++it)
-//     {
-//         std::cout << "["<< it->first << ", " << it->second << " ]";
-//     }
-//     std::cout << std::endl;
+    std::unordered_map<int, std::forward_list<std::string>> r_occur_count;
+    for (auto &e : occur_count)
+    {
+        // insertion de l'element, emplace renvoie <iterator, bool> avec iterator sur l'element
+        // inserer si non present, sinon pointe sur l'element deja present
+        auto elem_emplaced = r_occur_count.emplace(e.second, std::forward_list<std::string>());
+
+        elem_emplaced.first->second.push_front(e.first);
+    }
+    // // affichage formate de r_occur_count
+    // for (auto &e : r_occur_count)
+    // {
+    //     std::cout << "[" << e.first << ", {";
+    //     for (auto &p : e.second)
+    //     {
+    //         std::cout << p << ", ";
+    //     }
+    //     std::cout << "} ]" << std::endl;
+    // }
+
+    //      // affichage formate de occur_count
+    //     for(auto & e : occur_count)
+    //     {
+    //         std::cout << "["<< e.first << ", "<< e.second << "]"<< std::endl;
+    //     }
+    //     // Tri du vector
+    //    std::sort(v_entry.begin(), v_entry.end(),
+    //     [](pair<string, int> & a, pair<string, int> & b){
+    //         return a.second>b.second;
+    //     });
+    //     for (auto it = v_entry.begin(); it != v_entry.end(); ++it)
+    //     {
+    //         std::cout << "["<< it->first << ", " << it->second << " ]";
+    //     }
+    //     std::cout << std::endl;
     return 0;
 }
