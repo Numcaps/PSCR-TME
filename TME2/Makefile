@@ -4,6 +4,9 @@ INPUTS = main.cpp
 
 main: main.cpp utils.hpp
 	$(COMMAND) $(FLAGS) -o main main.cpp 
+
+mainMap: mainMap.cpp
+	$(COMMAND) $(FLAGS) -o mainMap  mainMap.cpp
 	
 mainHashTable: mainHashTable.o  HashTable.hpp
 	$(COMMAND) $(FLAGS) -o mainHashTable  mainHashTable.o 

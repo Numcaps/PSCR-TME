@@ -5,7 +5,9 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include "HashTable.hpp"
+#include <unordered_map>
+#include <iterator>
+#include <forward_list>
 
 int main()
 {
@@ -27,7 +29,7 @@ int main()
     int count_diff_num = 0;
 
     // Q10
-    pr::HashTable<string, int> occur_count(1000);
+    std::unordered_map<std::string, int> occur_count;
 
     std::cout << "-----Starting text parsing-----" << std::endl;
     while (input >> word)
@@ -41,19 +43,19 @@ int main()
 
         nombre_lu++;
 
-        int *val = occur_count.get(word);
+        auto val = occur_count.insert(pair<std::string, int>(word, 1));
 
         // ajout du mot dans la table
         // if (occur_count.size() >= 0.8 * occur_count.capacity())
         //      occur_count.grow(); // on test si la taille de la table est inferieur a sa capacite
         //  sinon on l'agrandit
-        if (val) // si word est deja dans la table
+
+        if (not(val.second)) // si word est deja dans la table
         {
-            occur_count.put(word, ++(*val));
+            val.first->second += 1 ;
         }
         else
         {
-            occur_count.put(word, 1);
             ++count_diff_num;
         }
     }
@@ -70,12 +72,12 @@ int main()
 
     // parcours du vecteur pour trouver "war", "peace", "toto"
     std::cout << "-----Starting count occurences-----\n\n";
-    std::cout << "Occurences of \"war\" : " << *(occur_count.get("war")) << endl;
-    std::cout << "Occurences of \"peace\" : " << *(occur_count.get("peace")) << endl;
-    int *a = occur_count.get("toto");
-    size_t b = a ? *a : 0;
+    std::cout << "Occurences of \"war\" : " << (occur_count.find("war"))->second << endl;
+    std::cout << "Occurences of \"peace\" : " << (occur_count.find("peace"))->second << endl;
+    auto a = occur_count.find("toto");
+    size_t b = a == occur_count.end() ? 0 : a->second;
     std::cout << "Occurences of \"toto\" : " << b << endl;
-    std::cout << "Table capacity : " << occur_count.capacity() << std::endl; // vecteur des entrees
+    std::cout << "Table capacity : " << occur_count.bucket_count() << std::endl; // vecteur des entrees
     std::cout << "-----Finish count occurences-----\n\n";
 
     
@@ -83,27 +85,32 @@ int main()
     std::cout << "-----Starting copy HT-----\n\n";
     std::cout << "RECOPIE" << std::endl;
     std::vector<pair<string, int>> v_entry;
-    pr::HashTable<string, int>::Iterator it = occur_count.begin();
-
+    auto it = occur_count.begin();
     auto e = occur_count.end();
     for (; it != e; ++it)
     {
-        v_entry.push_back(pair<string, int>((*it).getK(), (*it).getV()));
+        v_entry.push_back(*it);
     }
 
     std::cout << "-----Finish count HT-----\n\n";
     std::cout << v_entry.size() << std::endl;
     std::cout << occur_count.size() << std::endl;
 
-    // Tri du vector
-    std::sort(v_entry.begin(), v_entry.end(), 
-    [](pair<string, int> & a, pair<string, int> & b){
-        return a.second>b.second;
-    });
-    for (auto it = v_entry.begin(); it != v_entry.end(); ++it)
-    {
-        std::cout << "["<< it->first << ", " << it->second << " ]";
-    }
-    std::cout << std::endl;
+    std::unordered_map<int, forward_list<std::string>> r_occur_count;
+    
+//     for(auto & e : occur_count)
+//     {
+//         std::cout << "["<< e.first << ", "<< e.second << "]"<< std::endl;
+//     }
+//     // Tri du vector
+//    std::sort(v_entry.begin(), v_entry.end(), 
+//     [](pair<string, int> & a, pair<string, int> & b){
+//         return a.second>b.second;
+//     });
+//     for (auto it = v_entry.begin(); it != v_entry.end(); ++it)
+//     {
+//         std::cout << "["<< it->first << ", " << it->second << " ]";
+//     }
+//     std::cout << std::endl;
     return 0;
 }
