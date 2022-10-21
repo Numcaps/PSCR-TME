@@ -1,0 +1,6 @@
+CR TME4
+
+4) a chaque transaction on lock les deux comptes
+5) il y a un interblocage car on lock deux fois la meme mutex
+une premier fois avec l'appel de transfert() et une deuxieme
+avec les unique_lock dans les methodes. 
