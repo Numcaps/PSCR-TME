@@ -4,20 +4,29 @@ using namespace std;
 
 const int NB_THREAD = 100;
 int SOLDEINITIAL = 50;
-size_t K = 2; /* Nombre de comptes*/
+size_t K = 10; /* Nombre de comptes*/
 
 void Q1(pr::Banque &b)
 {
 	size_t i = rand() % K; /* ATTENTION INDICE DOIT CORRESPONDRE AU NOMBRE DE COMPTE */
 	size_t j = rand() % K;
 	size_t m = rand() % K + 1;
-	for (size_t c = 0; c < 10000; c++)
+	for (size_t c = 0; c < 1000; c++)
 	{
 		b.transfert(i, j, m);
-		std::cout << "Transfert de " << m << " $, de "<<i<<" a "<< j<<std::endl;
-		std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 20 + 1));
+		//std::cout << "Transfert de " << m << " $, de "<<i<<" a "<< j<<std::endl;
+		//std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 20 + 1));
 	}
 
+}
+void compta(pr::Banque &b)
+{
+	
+	for (size_t c = 0; c < 1000; c++)
+	{
+		b.comptabiliser(500);
+	}
+	
 }
 
 int main()
@@ -30,13 +39,13 @@ int main()
 	for (size_t c = 0; c < NB_THREAD; c++)
 	{
 		threads.emplace_back(Q1, std::ref(b));
+		threads.emplace_back(compta, std::ref(b));
 	}
 	
 	for (auto &t : threads)
 	{
 		t.join();
 	}
-
 	// TODO : tester solde = NB_THREAD * JP
 	return 0;
 }
