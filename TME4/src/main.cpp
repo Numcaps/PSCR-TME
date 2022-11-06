@@ -2,7 +2,7 @@
 #include <iostream>
 using namespace std;
 
-const int NB_THREAD = 100;
+const int NB_THREAD = 1000;
 int SOLDEINITIAL = 50;
 size_t K = 10; /* Nombre de comptes*/
 
