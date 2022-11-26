@@ -1,0 +1,31 @@
+1) fork_exo         10 processus (main compris)
+  └─fork_exo
+      ├─fork_exo
+      └─fork_exo
+          ├─fork_exo
+          ├─fork_exo
+          └─fork_exo
+              ├─fork_exo
+              ├─fork_exo
+              └─fork_exo
+
+2) 1 -> cpt=1 i=1
+    1_1 -> cpt = 1,cpt=2, i=1
+    1_1_1 -> cpt = 1, cpt = 0, i=1
+    1_1_2 -> cpt =0, i=2, cpt=1, cpt=2, cpt=3, i=3
+    1_1_2_1 -> i=2,  cpt=0
+    1_1_2_2 -> idem
+    1_1_2_3 -> cpt =0, i=3, cpt=1, cpt=2, cpt=3
+
+4) nanosleep() renvoie -1 si le processus a recu un signal
+ainsi il se peut que la duree du sleep ne se soit pas ecoule 
+completement. 
+La boucle permet de reveiller le processus en cas de reception
+d'un signal. Lors du reveil le processus execute le handler
+Puis le processus se rendort si il s'etait reveiller trop tot.
+
+5) ajouter srand different pour chaque processus
+
+6) ce n'est pas equitable car cela revient a imposer l'ordre
+des attaques et defenses. En effet, un proc attendra tjr de se 
+faire attaquer pour parer et vice versa a cause de sigsuspend
