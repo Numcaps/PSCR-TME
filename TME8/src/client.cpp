@@ -4,7 +4,7 @@
 #include <string>
 
 
-int main00() {
+int main0() {
 	pr::Socket sock;
 	sock.connect("localhost", 1664);
 	int N=42;
@@ -16,7 +16,7 @@ int main00() {
 
 
 // avec controle
-int main0() {
+int main() {
 
 	pr::Socket sock;
 
@@ -45,7 +45,7 @@ int main0() {
 
 
 // avec une boucle, on attend un 0
-int main() {
+int main00() {
 
 	pr::Socket sock;
 
