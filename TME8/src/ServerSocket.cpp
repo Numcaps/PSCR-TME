@@ -62,12 +62,13 @@ namespace pr
         /**
          * Acceptation de la connexion
          */
-        
+
         if ((fd = ::accept(socketfd, (struct sockaddr *)(&client), &len)) == -1)
         {
-            perror("Failed to accept the connexion !");
+            /* En cas d'erreur on ferme le serveur */
+            return Socket(-1);
         }
-        std::cout << "Connected to "<<&client<<std::endl;
+        std::cout << "Connected to " << &client << std::endl;
         return Socket(fd);
     }
 

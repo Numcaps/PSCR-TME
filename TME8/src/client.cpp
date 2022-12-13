@@ -16,7 +16,7 @@ int main0() {
 
 
 // avec controle
-int main() {
+int main00() {
 
 	pr::Socket sock;
 
@@ -45,7 +45,7 @@ int main() {
 
 
 // avec une boucle, on attend un 0
-int main00() {
+int main() {
 
 	pr::Socket sock;
 

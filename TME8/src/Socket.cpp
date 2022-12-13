@@ -19,7 +19,7 @@ namespace pr
         /* Resolution nom */
         const char *name = host.c_str();
         struct addrinfo hints;
-        struct addrinfo *res,* pp;
+        struct addrinfo *res, *pp;
 
         /**
          * Man impose de set a zero tt les
@@ -43,7 +43,7 @@ namespace pr
             perror("getaddrinfo() failed !");
         }
         /**
-         * On parocurs la liste
+         * On parcours la liste
          */
         for (pp = res; pp != NULL; pp = pp->ai_next)
         {
@@ -72,8 +72,8 @@ namespace pr
          * Liberation de la memoire allouee pour res
          */
         freeaddrinfo(res);
-        if(fd==-1) perror("Failed to connect !");
-        
+        if (fd == -1)
+            perror("Failed to connect !");
     }
 
     void Socket::connect(in_addr ipv4, int port)
@@ -111,7 +111,7 @@ namespace pr
          * Destruction du file descriptor
          */
         ::close(fd);
-        fd=-1;
+        fd = -1;
     }
 
 } // namespace pr

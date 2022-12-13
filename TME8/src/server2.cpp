@@ -1,7 +1,7 @@
 #include "TCPServer.h"
 #include <iostream>
 #include <unistd.h>
-
+#include <thread>
 
 class IncrementServer : public pr::ConnectionHandler {
 
@@ -42,7 +42,10 @@ int main() {
 
 	pr::TCPServer server(new IncrementServer());
 
-	server.startServer(1664);
+	int port = 1664;
+	std::thread t(&pr::TCPServer::startServer, std::ref(server), port);
+
+	//server.startServer(1664);
 
 	// attend entree sur la console
 	std::string s ;
@@ -51,8 +54,9 @@ int main() {
 	std::cout << "Début fin du serveur." << std::endl ;
 	// on quit
 	server.stopServer();
+	t.join();
 	std::cout << "Ok fin du serveur." << std::endl;
-
+	
 	return 0;
 }
 

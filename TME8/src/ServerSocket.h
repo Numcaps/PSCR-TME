@@ -7,6 +7,7 @@ namespace pr {
 
 class ServerSocket {
 	int socketfd;
+	const int MAX_CONN = 10;
 
 public :
 	// Demarre l'ecoute sur le port donne
@@ -14,7 +15,7 @@ public :
 
 	int getFD() { return socketfd;}
 	bool isOpen() const {return socketfd != -1;}
-
+	int getMaxConn() const {return MAX_CONN;}
 	Socket accept();
 
 	void close();
