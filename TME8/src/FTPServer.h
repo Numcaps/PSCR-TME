@@ -13,14 +13,39 @@
 
 namespace pr
 {
+
+    /*==================================================================*/
+    class FTPServer
+    {
+        TCPServer *serv;
+        /* repertoire ou mettre les fichiers du client */
+        DIR *dir;
+
+    public:
+        enum FTP_REQUEST
+        {
+            LIST = 0,
+            UPLOAD,
+            DOWNLOAD
+        };
+        FTPServer(ConnectionHandler *ch, const char *);
+        void startServer(int port);
+        void stopServer();
+        DIR *getDir();
+        static const char *toString(FTP_REQUEST fr);
+        static FTP_REQUEST toFTP_REQUEST(const char *s);
+    };
+    /*==================================================================*/
     class FTPConnectionHandler : public ConnectionHandler
     {
         DIR *dir;
 
     public:
-        FTPConnectionHandler(DIR *d) : dir(d){};
+        void setDir(DIR *d) { dir = d; }
         virtual void handleConnection(Socket s)
         {
+            int sync;
+            char end = '\0';
             /* Recupere le file descriptor */
             int fd = s.getFD();
 
@@ -34,15 +59,11 @@ namespace pr
             /* Boucle de controle */
             while (1)
             {
+                std::cout << "Waiting for client request ..." << std::endl;
                 auto nblu = read(fd, client_buff, msz);
                 if (nblu == 0)
                 {
                     std::cout << "Fin connexion par client" << std::endl;
-                    break;
-                }
-                else if (nblu < msz)
-                {
-                    perror("FTPServer handler read error !");
                     break;
                 }
                 else
@@ -66,8 +87,8 @@ namespace pr
 
                     /**
                      *  Recuperation speculative du fichier a download
-                     *  ou qui va etre upload 
-                    */
+                     *  ou qui va etre upload(besoin pour creer fichier)
+                     */
                     strcpy(filename, rq + i);
 
                     /* Determination de la requete */
@@ -75,43 +96,101 @@ namespace pr
                     switch (fq)
                     {
                     case FTPServer::LIST:
+                    {
+                        std::cout << "LIST request received !" << std::endl;
                         std::cout << "Sending list file ..." << std::endl;
                         /* Parcours des entrees du directory */
-                        struct dirent *dir_list;
-                        while ((dir_list = readdir(dir)) != nullptr)
+                        rewinddir(dir);
+                        struct dirent *dir_l;
+                        while ((dir_l = readdir(dir)) != nullptr)
                         {
+                            //std::cout << "[DEBUG] LIST SERVER : dir_l=" << dir_l->d_name << std::endl;
                             /* Standard recommande d'utiliser strlen pour d_name*/
-                            write(fd, dir_list->d_name, strlen(dir_list->d_name));
+                            if (write(fd, dir_l->d_name, strlen(dir_l->d_name)) == -1)
+                            {
+                                perror("Error write LIST");
+                            }
+                            /* Boucle de synchro */
+                            int r;
+                            while((r=read(fd,&sync,sizeof(sync)))!=0)
+                            {
+                                if(r==-1)
+                                perror("Error read sync !");
+                                else
+                                    if(sync) break;
+                            }
                         }
-                        break;
+
+                        if (write(fd, &end, sizeof(end)) == -1)
+                        {
+                            perror("Error write end LIST");
+                        }
+                    }
+                    break;
                     case FTPServer::DOWNLOAD:
+                    {
+                        std::cout << "DOWNLOAD request received !" << std::endl;
                         std::cout << "Sending file " << filename
                                   << " ..." << std::endl;
                         /* Recherche du fichier dans directory */
-                        struct dirent *dir_list;
-                        while ((dir_list = readdir(dir)) != nullptr)
+                        struct dirent *dir_d;
+                        while ((dir_d = readdir(dir)) != nullptr)
                         {
                             /* Le fichier existe ! */
-                            if (!strcmp(filename, dir_list->d_name))
+                            if (!strcmp(filename, dir_d->d_name))
                             {
                                 /* Ouverture du fichier */
-                                int fdf = open(dir_list->d_name, O_RDONLY);
-                                char c[512];
-                                memset(c, 0, sizeof(c));
+                                int fdf = open(dir_d->d_name, O_RDONLY);
+                                char data[512];
+                                memset(data, 0, sizeof(data));
                                 /* On envoie des paquets de 512 octets*/
-                                while (read(fdf, c, sizeof(c)) != 0)
+                                int rd;
+                                while ((rd = read(fdf, data, sizeof(data))) != 0)
                                 {
-                                    write(fd, c, sizeof(c));
+                                    if (rd == -1)
+                                        perror("Error read DOWNLOAD !");
+                                    if (write(fd, data, sizeof(data)) != -1)
+                                    {
+                                        perror("Error write DOWNLOAD");
+                                    }
                                 }
                                 /* Fermeture du fichier */
                                 close(fdf);
+                            }
+                            else
+                            {
+                                /* Fichier n'existe pas */
+                                std::cout << "File not found in directory, sending nothing ..." << std::endl;
+                                write(fd, "", 0);
                                 break;
                             }
                         }
                         perror("Error file do not exist !");
+                    }
+                    break;
                     case FTPServer::UPLOAD:
-                        std::cout << "Sending file " << filename
+                    {
+                        std::cout << "UPLOAD request received !" << std::endl;
+                        std::cout << "Receiving file " << filename
                                   << " ..." << std::endl;
+                        int fdf;
+                        if ((fdf = open(filename, O_CREAT | O_WRONLY)) == -1)
+                        {
+                            perror("Cannot create file UPLOAD !");
+                        }
+                        char data[512];
+                        int rd;
+                        while ((rd = read(fd, data, sizeof(data))) != 0)
+                        {
+                            if (rd == -1)
+                                perror("Error read UPLOAD");
+                            if (write(fdf, data, sizeof(data)) == -1)
+                            {
+                                perror("Error write UPLOAD");
+                            }
+                        }
+                    }
+                    break;
                     default:
                         break;
                     }
@@ -121,33 +200,12 @@ namespace pr
         // une copie identique
         virtual ConnectionHandler *clone() const
         {
-            return new FTPConnectionHandler(dir);
+            auto f = new FTPConnectionHandler();
+            f->setDir(dir);
+            return f;
         }
     };
 
-    /*==================================================================*/
-    class FTPServer
-    {
-        TCPServer *serv;
-        /* repertoire ou mettre les fichiers du client */
-        DIR *dir;
-
-    public:
-        enum FTP_REQUEST
-        {
-            LIST = 0,
-            UPLOAD,
-            DOWNLOAD
-        };
-        FTPServer(ConnectionHandler *ch, const char *d);
-        void startServer(int port);
-        void stopServer();
-        DIR *getDir();
-        static char *FTPServer::toString(FTP_REQUEST fr);
-        static FTP_REQUEST FTPServer::toFTP_REQUEST(const char *s);
-
-        ~FTPServer();
-    };
     /*==================================================================*/
     FTPServer::FTPServer(ConnectionHandler *ch, const char *d)
     {
@@ -156,6 +214,13 @@ namespace pr
         {
             perror("opendir error !");
         }
+        FTPConnectionHandler *h;
+        if ((h = dynamic_cast<FTPConnectionHandler *>(ch)) != nullptr)
+        {
+            h->setDir(dir);
+        }
+        else
+            perror("Handler error ! ");
 
         serv = new TCPServer(ch);
     }
@@ -167,37 +232,38 @@ namespace pr
 
     void FTPServer::stopServer()
     {
+        std::cout << "Closing server ..." << std::endl;
         serv->stopServer();
     }
 
-    char *FTPServer::toString(FTP_REQUEST fr)
+    const char *FTPServer::toString(FTP_REQUEST fr)
     {
         switch (fr)
         {
         case LIST:
-            return "LIST";
+            return std::string("LIST").c_str();
         case UPLOAD:
-            return "UPLOAD";
+            return std::string("UPLOAD").c_str();
         case DOWNLOAD:
-            return "DOWNLOAD";
+            return std::string("DOWNLOAD").c_str();
         default:
             perror("FTP_Server toString error !");
-            break;
+            return nullptr;
         }
     }
 
     FTPServer::FTP_REQUEST FTPServer::toFTP_REQUEST(const char *s)
     {
         std::string st(s);
-        if (s == "LIST")
+        if (s == std::string("LIST"))
         {
             return LIST;
         }
-        if (s == "UPLOAD")
+        if (s == std::string("UPLOAD"))
         {
             return UPLOAD;
         }
-        if (s == "DOWNLOAD")
+        if (s == std::string("DOWNLOAD"))
         {
             return DOWNLOAD;
         }
