@@ -10,7 +10,7 @@ int main(int argc, char const *argv[])
         return 1;
     }
 
-    FTPServer server(new FTPConnectionHandler(), argv[2]);
+    FTPServer server(new FTPConnectionHandler(),(char*) argv[2]);
 
     int port = atoi(argv[1]);
     std::thread t(&pr::FTPServer::startServer, std::ref(server), port);

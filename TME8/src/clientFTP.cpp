@@ -43,7 +43,7 @@ int main(int argc, char const *argv[])
             case pr::FTPServer::LIST:
             {
                 std::cout << "Sending LIST request to server ..." << std::endl;
-                char data[512];
+                char data[128];
                 explicit_bzero(data, sizeof(data));
                 /* Separateur pour parsing du serveur */
                 strcat(rq, " ");
@@ -75,21 +75,23 @@ int main(int argc, char const *argv[])
             {
                 std::cout << "Enter filename : ";
                 std::cin >> filename;
-                char data[512];
-                /* File descriptor du fichier a telecharger */
-                int ffd;
+                char data[128];
+                memset(data, 0, sizeof(data));
+                /* fichier a telecharger */
+                FILE *ffd;
 
                 /* Creation de la requete */
-                strcat(rq, " ");
-                strcat(rq, filename);
+                strcat(data, rq);
+                strcat(data, " ");
+                strcat(data, filename);
 
                 /* Envoie de la requete au serveur */
                 std::cout << "Sending DOWNLOAD request to server ..." << std::endl;
-                if (write(fd, rq, sizeof(rq)) == -1)
+                if (write(fd, data, sizeof(data)) == -1)
                 {
                     perror("Error write DOWNLOAD");
                 }
-                if ((ffd = open(filename, O_CREAT | O_WRONLY)) == -1)
+                if ((ffd = fopen(filename, "w")) == nullptr)
                 {
                     perror("Cannot create file DOWNLOAD !");
                 }
@@ -101,40 +103,53 @@ int main(int argc, char const *argv[])
                 {
                     if (rd == -1)
                         perror("Error read DOWNLOAD");
-                    if (write(ffd, data, sizeof(data)) == -1)
-                    {
-                        perror("Error write DOWNLOAD");
-                    }
+                    if (!strcmp(data, ""))
+                        break;
+                    fwrite(data, sizeof(char), strlen(data), ffd);
+
+                    explicit_bzero(data, sizeof(data));
                 }
-                close(ffd);
+
+                fclose(ffd);
                 std::cout << "DOWNLOAD request completed !" << std::endl
                           << std::endl;
             }
             break;
             case pr::FTPServer::UPLOAD:
             {
+                char p[128];
+                memset(p, 0, sizeof(p));
                 std::cout << "Enter filename : ";
                 std::cin >> filename;
-                char data[512];
+                std::cout << "Enter absolute path of the file (including the filename) : ";
+                std::cin >> p;
+                char data[128];
+                memset(data, 0, sizeof(data));
                 /* File descriptor du fichier a televerser */
                 int ffd;
 
                 /* Creation de la requete */
-                strcat(rq, " ");
-                strcat(rq, filename);
+                strcat(data, rq);
+                strcat(data, " ");
+                strcat(data, filename);
 
                 /* Envoie de la requete au serveur */
                 std::cout << "Sending UPLOAD request to server ..." << std::endl;
-                if (write(fd, rq, sizeof(rq)) == -1)
+                if (write(fd, data, sizeof(data)) == -1)
                 {
                     perror("Error write UPLOAD");
                 }
-                if ((ffd = open(filename, O_RDONLY)) == -1)
+                memset(data, 0, sizeof(data));
+                /* Ajouter condition pour que open ne creer pas le fichier
+                s'il existe pas
+                */
+                if ((ffd = open(p, O_RDONLY)) == -1)
                 {
                     perror("Cannot read file UPLOAD !");
                 }
-
+                /* Lecture du fichier */
                 int rd;
+                
                 while ((rd = read(ffd, data, sizeof(data))) != 0)
                 {
                     if (rd == -1)
@@ -145,6 +160,12 @@ int main(int argc, char const *argv[])
                     }
                 }
                 close(ffd);
+                char end = '\0';
+                if (write(fd, &end, sizeof(end)) == -1)
+                {
+                    perror("Error write end UPLOAD");
+                }
+                
                 std::cout << "UPLOAD request completed !" << std::endl
                           << std::endl;
             }

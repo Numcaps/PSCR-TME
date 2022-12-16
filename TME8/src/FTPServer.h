@@ -28,7 +28,7 @@ namespace pr
             UPLOAD,
             DOWNLOAD
         };
-        FTPServer(ConnectionHandler *ch, const char *);
+        FTPServer(ConnectionHandler *ch, char *);
         void startServer(int port);
         void stopServer();
         DIR *getDir();
@@ -39,9 +39,14 @@ namespace pr
     class FTPConnectionHandler : public ConnectionHandler
     {
         DIR *dir;
+        char *path;
 
     public:
         void setDir(DIR *d) { dir = d; }
+        void setPath(char *p)
+        {
+            path = p;
+        }
         virtual void handleConnection(Socket s)
         {
             int sync;
@@ -89,7 +94,7 @@ namespace pr
                      *  Recuperation speculative du fichier a download
                      *  ou qui va etre upload(besoin pour creer fichier)
                      */
-                    strcpy(filename, rq + i);
+                    strcpy(filename, client_buff + i);
 
                     /* Determination de la requete */
                     fq = FTPServer::toFTP_REQUEST(rq);
@@ -104,7 +109,7 @@ namespace pr
                         struct dirent *dir_l;
                         while ((dir_l = readdir(dir)) != nullptr)
                         {
-                            //std::cout << "[DEBUG] LIST SERVER : dir_l=" << dir_l->d_name << std::endl;
+                            // std::cout << "[DEBUG] LIST SERVER : dir_l=" << dir_l->d_name << std::endl;
                             /* Standard recommande d'utiliser strlen pour d_name*/
                             if (write(fd, dir_l->d_name, strlen(dir_l->d_name)) == -1)
                             {
@@ -112,12 +117,12 @@ namespace pr
                             }
                             /* Boucle de synchro */
                             int r;
-                            while((r=read(fd,&sync,sizeof(sync)))!=0)
+                            while ((r = read(fd, &sync, sizeof(sync))) != 0)
                             {
-                                if(r==-1)
-                                perror("Error read sync !");
-                                else
-                                    if(sync) break;
+                                if (r == -1)
+                                    perror("Error read sync !");
+                                else if (sync == 1)
+                                    break;
                             }
                         }
 
@@ -133,29 +138,44 @@ namespace pr
                         std::cout << "Sending file " << filename
                                   << " ..." << std::endl;
                         /* Recherche du fichier dans directory */
+                        rewinddir(dir);
                         struct dirent *dir_d;
-                        while ((dir_d = readdir(dir)) != nullptr)
+                        while (true)
                         {
-                            /* Le fichier existe ! */
-                            if (!strcmp(filename, dir_d->d_name))
+                            if ((dir_d = readdir(dir)) != nullptr)
                             {
-                                /* Ouverture du fichier */
-                                int fdf = open(dir_d->d_name, O_RDONLY);
-                                char data[512];
-                                memset(data, 0, sizeof(data));
-                                /* On envoie des paquets de 512 octets*/
-                                int rd;
-                                while ((rd = read(fdf, data, sizeof(data))) != 0)
+                                /* Le fichier existe ! */
+                                if (!strcmp(filename, dir_d->d_name))
                                 {
-                                    if (rd == -1)
-                                        perror("Error read DOWNLOAD !");
-                                    if (write(fd, data, sizeof(data)) != -1)
+                                    /* Ouverture du fichier */
+                                    int fdf;
+                                    char fp[256];
+                                    memset(fp, 0, sizeof(fp));
+                                    strcat(fp, path);
+                                    strcat(fp, "/");
+                                    strcat(fp, dir_d->d_name);
+
+                                    if ((fdf = open(fp, O_RDONLY)) == -1)
                                     {
-                                        perror("Error write DOWNLOAD");
+                                        perror("Unable to open file DOWNLOAD");
                                     }
+                                    char data[128];
+                                    memset(data, 0, sizeof(data));
+                                    /* On envoie des paquets de 128 octets*/
+                                    int rd;
+                                    while ((rd = read(fdf, data, sizeof(data))) != 0)
+                                    {
+                                        if (rd == -1)
+                                            perror("Error read DOWNLOAD !");
+                                        if (write(fd, data, sizeof(data)) != -1)
+                                        {
+                                            perror("Error write DOWNLOAD");
+                                        }
+                                    }
+                                    /* Fermeture du fichier */
+                                    close(fdf);
+                                    break;
                                 }
-                                /* Fermeture du fichier */
-                                close(fdf);
                             }
                             else
                             {
@@ -165,30 +185,39 @@ namespace pr
                                 break;
                             }
                         }
-                        perror("Error file do not exist !");
+                        if (write(fd, &end, sizeof(end)) == -1)
+                        {
+                            perror("Error write end LIST");
+                        }
                     }
                     break;
                     case FTPServer::UPLOAD:
                     {
                         std::cout << "UPLOAD request received !" << std::endl;
-                        std::cout << "Receiving file " << filename
-                                  << " ..." << std::endl;
-                        int fdf;
-                        if ((fdf = open(filename, O_CREAT | O_WRONLY)) == -1)
+
+                        FILE *fdf;
+                        char p[128];
+                        memset(p,0,sizeof(p));
+                        strcat(p,path);
+                        strcat(p,"/");
+                        strcat(p,filename);
+                        if ((fdf = fopen(p, "w")) == nullptr)
                         {
                             perror("Cannot create file UPLOAD !");
                         }
-                        char data[512];
+                        char data[128];
                         int rd;
+                        std::cout << "Receiving file " << filename
+                                  << " ..." << std::endl;
                         while ((rd = read(fd, data, sizeof(data))) != 0)
                         {
                             if (rd == -1)
                                 perror("Error read UPLOAD");
-                            if (write(fdf, data, sizeof(data)) == -1)
-                            {
-                                perror("Error write UPLOAD");
-                            }
+                            if (!strcmp(data, ""))
+                                break;
+                            fwrite(data, sizeof(char), strlen(data), fdf);
                         }
+                        fclose(fdf);
                     }
                     break;
                     default:
@@ -202,12 +231,13 @@ namespace pr
         {
             auto f = new FTPConnectionHandler();
             f->setDir(dir);
+            f->setPath(path);
             return f;
         }
     };
 
     /*==================================================================*/
-    FTPServer::FTPServer(ConnectionHandler *ch, const char *d)
+    FTPServer::FTPServer(ConnectionHandler *ch, char *d)
     {
 
         if ((dir = opendir(d)) == nullptr)
@@ -218,6 +248,7 @@ namespace pr
         if ((h = dynamic_cast<FTPConnectionHandler *>(ch)) != nullptr)
         {
             h->setDir(dir);
+            h->setPath(d);
         }
         else
             perror("Handler error ! ");
@@ -269,7 +300,8 @@ namespace pr
         }
         else
         {
-            perror("toFTP_REQUEST error !");
+            perror("toFTP_REQUEST error,  return LIST !");
+            return LIST;
         }
     }
 
