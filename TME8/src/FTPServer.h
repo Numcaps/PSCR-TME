@@ -55,7 +55,7 @@ namespace pr
             int fd = s.getFD();
 
             /* Buffer message du client */
-            char client_buff[256];
+            char client_buff[128];
             memset(client_buff, 0, sizeof(client_buff));
 
             /* Taille du buffer client */
@@ -76,11 +76,11 @@ namespace pr
                     /* Recuperation de la requete */
                     enum FTPServer::FTP_REQUEST fq;
                     char rq[9];
-                    char filename[256];
+                    char filename[128];
                     memset(rq, 0, sizeof(rq));
                     memset(filename, 0, sizeof(filename));
                     int i;
-                    for (i = 0; i < 256; i++)
+                    for (i = 0; i < 128; i++)
                     {
                         if (client_buff[i] == ' ')
                         {
@@ -149,7 +149,7 @@ namespace pr
                                 {
                                     /* Ouverture du fichier */
                                     int fdf;
-                                    char fp[256];
+                                    char fp[128];
                                     memset(fp, 0, sizeof(fp));
                                     strcat(fp, path);
                                     strcat(fp, "/");
